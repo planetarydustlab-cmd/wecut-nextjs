@@ -1,0 +1,48 @@
+{
+    "nav": {
+        "shop": "SHOP",
+        "locations": "LOCATIONS",
+        "about": "ABOUT",
+        "search": "SEARCH",
+        "cart": "CART"
+    },
+    "hero": {
+        "tagline": "Est. 2012 — Global",
+        "headline1": "Precision",
+        "headline2": "& Texture.",
+        "subheadline": "Cuts shaped by proportion and flow, designed to hold their form.",
+        "visit_salon": "Visit A Salon",
+        "shop_lab": "Shop The Lab"
+    },
+    "manifesto": {
+        "quote": "\"WECUT is a dialogue between the raw and the refined. Born in Australia, expanded to Taipei. We blend the precision of a laboratory with the soul of an artist's studio.\""
+    },
+    "locations": {
+        "title": "Our Spaces",
+        "subtitle": "COORDINATES / GLOBAL",
+        "origin": "ORIGIN",
+        "expansion": "EXPANSION",
+        "walk_in": "WALK-IN ONLY",
+        "book_now": "BOOK NOW"
+    },
+    "shop": {
+        "title": "The Lab.",
+        "subtitle": "THE LAB / FORMULATIONS",
+        "coming_soon": "Coming Soon",
+        "notify_me": "NOTIFY ME",
+        "view_all": "VIEW ALL PRODUCTS →"
+    },
+    "about": {
+        "title": "The Blueprint",
+        "subtitle": "DOCUMENT NO. AB-2012"
+    },
+    "footer": {
+        "contact": "CONTACT",
+        "locations": "LOCATIONS",
+        "social": "SOCIAL",
+        "newsletter": "NEWSLETTER",
+        "join": "JOIN",
+        "terms": "TERMS",
+        "privacy": "PRIVACY"
+    }
+}

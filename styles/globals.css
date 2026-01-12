@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --color-paper: #FAFAF8;
+        --color-ink: #1A1A1A;
+        --color-concrete: #E2E2E2;
+        --color-line: #D4D2CC;
+    }
+
+    body {
+        font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+        background-color: var(--color-paper);
+        color: var(--color-ink);
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        font-family: var(--font-crimson), Georgia, serif;
+    }
+}
+
+/* Custom Scrollbar Hide */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}

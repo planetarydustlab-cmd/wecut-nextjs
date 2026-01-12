@@ -1,0 +1,48 @@
+{
+    "nav": {
+        "shop": "選購",
+        "locations": "門市",
+        "about": "關於",
+        "search": "搜尋",
+        "cart": "購物車"
+    },
+    "hero": {
+        "tagline": "創立於 2012 — 全球",
+        "headline1": "Precision",
+        "headline2": "& Texture.",
+        "subheadline": "以比例與髮流為準，剪出能維持的輪廓。",
+        "visit_salon": "預約服務",
+        "shop_lab": "瀏覽實驗室"
+    },
+    "manifesto": {
+        "quote": "「WECUT 是粗獷與精緻之間的對話。源自澳洲，拓展至台北。我們將實驗室的精準與藝術家工作室的靈魂融為一體。」"
+    },
+    "locations": {
+        "title": "空間",
+        "subtitle": "座標 / 全球",
+        "origin": "起源",
+        "expansion": "拓展",
+        "walk_in": "免預約",
+        "book_now": "立即預約"
+    },
+    "shop": {
+        "title": "The Lab.",
+        "subtitle": "THE LAB / 配方",
+        "coming_soon": "即將推出",
+        "notify_me": "通知我",
+        "view_all": "查看所有產品 →"
+    },
+    "about": {
+        "title": "藍圖",
+        "subtitle": "文件編號 AB-2012"
+    },
+    "footer": {
+        "contact": "聯絡",
+        "locations": "門市",
+        "social": "社群",
+        "newsletter": "電子報",
+        "join": "訂閱",
+        "terms": "條款",
+        "privacy": "隱私"
+    }
+}
