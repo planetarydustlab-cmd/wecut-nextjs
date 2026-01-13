@@ -1,11 +1,13 @@
-import Link from 'next/link'
+import { createClient } from '../../../lib/supabase/server'
+import { cookies } from 'next/headers'
+import AddToCartButton from '../../../components/AddToCartButton'
 
 const dictionaries = {
     en: () => import('../../../i18n/en.json').then((module) => module.default),
     zh: () => import('../../../i18n/zh.json').then((module) => module.default),
 }
 
-async function getDictionary(locale) {
+export async function getDictionary(locale) {
     return dictionaries[locale]()
 }
 
@@ -14,89 +16,89 @@ export default async function Shop({ params }) {
     const dict = await getDictionary(lang)
     const isZh = lang === 'zh'
 
-    const products = [
-        { code: 'SH-01', name: isZh ? '洗髮精 01' : 'SHAMPOO 01', description: isZh ? '保濕配方' : 'Hydrating Formula', notes: 'Cedarwood, Bergamot' },
-        { code: 'CD-01', name: isZh ? '護髮素 01' : 'CONDITIONER 01', description: isZh ? '修護配方' : 'Repairing Agent', notes: 'Argan, Rosemary' },
-        { code: 'TX-02', name: isZh ? '紋理膏' : 'TEXTURE PASTE', description: isZh ? '霧面定型' : 'Matte Finish', notes: 'Beeswax, Kaolin' },
-        { code: 'OL-03', name: isZh ? '護髮油' : 'HAIR OIL', description: isZh ? '光澤精華' : 'Shine Serum', notes: 'Jojoba, Vitamin E' },
-        { code: 'SP-01', name: isZh ? '海鹽噴霧' : 'SEA SALT SPRAY', description: isZh ? '紋理蓬鬆' : 'Texture & Volume', notes: 'Sea Minerals, Aloe' },
-        { code: 'PM-02', name: isZh ? '髮蠟' : 'POMADE', description: isZh ? '中等定型' : 'Medium Hold', notes: 'Lanolin, Tea Tree' },
-    ]
+    const cookieStore = cookies()
+    const supabase = createClient(cookieStore)
+
+    // Fetch products from Supabase
+    // Select new fields: volume, formula_id, scent_profile_en, scent_profile_zh
+    const { data: products } = await supabase
+        .from('product_pages')
+        .select('*')
+        .order('created_at', { ascending: true })
 
     return (
-        <div className="bg-paper min-h-screen">
-            {/* HEADER */}
-            <section className="pt-24 pb-16 px-6 border-b border-line">
-                <div className="max-w-6xl mx-auto">
-                    <p className={`text-[10px] font-mono text-gray-500 mb-4 ${isZh ? 'tracking-normal' : 'tracking-[0.4em] uppercase'}`}>
-                        {dict.shop.subtitle}
-                    </p>
-                    <h1 className={`text-5xl md:text-7xl font-serif italic ${isZh ? 'font-light' : 'font-normal'}`}>
-                        {dict.shop.title}
-                    </h1>
-                </div>
-            </section>
+        <div className="bg-paper min-h-screen pt-24 pb-20 px-6 md:px-12">
+            <h1 className="text-[10px] font-mono tracking-[0.2em] uppercase mb-12 md:mb-20 text-gray-400">
+                {dict.shop?.title || 'SHOP'} ({products?.length || 0})
+            </h1>
 
-            {/* PRODUCT GRID */}
-            <section className="max-w-6xl mx-auto py-16 px-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0">
-                    {products.map((product, index) => (
-                        <div
-                            key={index}
-                            className="border border-line p-8 group cursor-pointer hover:bg-white transition-colors rounded-none"
-                        >
-                            <div className="w-full aspect-[4/3] mb-8 overflow-hidden bg-[#E8E6E0]">
-                                <img 
-                                    src="/wecut_product.png" 
-                                    alt={product.name}
-                                    className="w-full h-full object-cover rounded-none grayscale hover:grayscale-0 transition-all duration-700"
-                                />
+            {!products || products.length === 0 ? (
+                <div className="text-center py-32 border-t border-b border-line">
+                    <p className="font-serif italic text-2xl text-gray-400 mb-4">
+                        {isZh ? '實驗室準備中' : 'Formulations in progress.'}
+                    </p>
+                    <p className="font-mono text-xs text-gray-300 uppercase tracking-widest">
+                        Check back soon
+                    </p>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-24">
+                    {products.map((product) => (
+                        <div key={product.id} className="group flex flex-col">
+                            {/* Image Area - Lab Style */}
+                            <div className="aspect-square bg-[#E8E6E0] mb-8 relative overflow-hidden grayscale group-hover:grayscale-0 transition-all duration-700">
+                                {product.image_url ? (
+                                    <img
+                                        src={product.image_url}
+                                        alt={isZh ? product.name_zh : product.name_en}
+                                        className="w-full h-full object-cover mix-blend-multiply"
+                                    />
+                                ) : (
+                                    <div className="absolute inset-0 flex flex-col items-center justify-center p-6 border border-[#D5D5D0] m-4">
+                                        <span className="font-mono text-[10px] text-gray-400 tracking-[0.2em] mb-2">LAB SAMPLE</span>
+                                        <span className="font-serif italic text-3xl text-[#C0C0C0]">{product.formula_id || 'N/A'}</span>
+                                    </div>
+                                )}
                             </div>
 
-                            <div className="border-t border-line pt-6">
-                                <p className="text-[10px] font-mono text-gray-400 mb-2">
-                                    FORMULA NO. {product.code}
-                                </p>
-                                <h3 className={`text-[11px] font-sans font-normal mb-2 ${isZh ? 'tracking-normal' : 'uppercase tracking-[0.2em]'}`}>
-                                    {product.name}
-                                </h3>
-                                <p className={`text-sm font-serif italic text-gray-500 mb-4 ${isZh ? 'font-light' : 'font-normal'}`}>
-                                    {product.description}
-                                </p>
-                                <p className="text-[10px] font-mono text-gray-400 mb-6">
-                                    NOTES: {product.notes.toUpperCase()}
-                                </p>
-                                <div className="flex justify-between items-center">
-                                    <span className={`text-xs font-mono text-gray-400 ${isZh ? 'tracking-normal' : 'uppercase tracking-[0.1em]'}`}>
-                                        {dict.shop.coming_soon}
+                            {/* Product Details - Le Labo / Aesop style */}
+                            <div className="flex flex-col flex-1 relative">
+                                {/* Top Line: Formula ID and Volume */}
+                                <div className="flex justify-between items-baseline mb-3 pb-3 border-b border-line">
+                                    <h3 className="font-mono text-[10px] tracking-[0.2em] uppercase text-gray-500">
+                                        F.No {product.formula_id || '---'}
+                                    </h3>
+                                    <span className="font-mono text-[10px] text-gray-400">
+                                        {product.volume || '---'}
                                     </span>
-                                    <span className="border border-gray-300 text-gray-400 px-4 py-2 text-[10px] tracking-[0.2em] uppercase font-sans rounded-none cursor-not-allowed">
-                                        {dict.shop.notify_me}
-                                    </span>
+                                </div>
+
+                                {/* Name */}
+                                <h2 className="font-serif text-2xl italic mb-2 pr-4">
+                                    {isZh ? product.name_zh : product.name_en}
+                                </h2>
+
+                                {/* Scent Profile */}
+                                <p className="font-sans text-[11px] text-gray-500 mb-8 leading-relaxed max-w-[90%]">
+                                    {isZh ? product.scent_profile_zh : product.scent_profile_en}
+                                </p>
+
+                                {/* Action */}
+                                <div className="mt-auto">
+                                    <AddToCartButton product={product} lang={lang} />
+
+                                    {/* Notes / Technicals */}
+                                    <div className="mt-4 pt-4 border-t border-line border-dashed">
+                                        <p className="font-mono text-[9px] text-gray-400 uppercase tracking-widest text-center">
+                                            {isZh ? '專業沙龍配方' : 'Professional Grade Formulation'}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     ))}
                 </div>
-            </section>
-
-            {/* CTA SECTION */}
-            <section className="border-t border-line py-24">
-                <div className="max-w-2xl mx-auto text-center px-6">
-                    <h2 className={`text-3xl font-serif italic mb-6 ${isZh ? 'font-light' : 'font-normal'}`}>
-                        {isZh ? '專屬配方' : 'Custom Formulations'}
-                    </h2>
-                    <p className={`font-sans text-sm text-gray-600 mb-8 ${isZh ? 'leading-loose' : 'leading-relaxed'}`}>
-                        {isZh ? '需要針對您的髮質或氣候的特定配方？請聯繫我們進行個人化諮詢。' : 'Need something specific for your hair texture or climate? Contact us for a personalized consultation.'}
-                    </p>
-                    <Link
-                        href={`/${lang}/locations`}
-                        className={`border border-ink px-8 py-3 text-[10px] font-sans hover:bg-ink hover:text-paper transition-colors rounded-none inline-block ${isZh ? 'tracking-normal' : 'tracking-[0.2em] uppercase'}`}
-                    >
-                        {dict.hero.visit_salon}
-                    </Link>
-                </div>
-            </section>
+            )}
         </div>
     )
 }

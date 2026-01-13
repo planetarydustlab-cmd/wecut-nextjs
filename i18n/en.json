@@ -3,6 +3,7 @@
         "shop": "SHOP",
         "locations": "LOCATIONS",
         "about": "ABOUT",
+        "journal": "JOURNAL",
         "search": "SEARCH",
         "cart": "CART"
     },
@@ -35,6 +36,14 @@
     "about": {
         "title": "The Blueprint",
         "subtitle": "DOCUMENT NO. AB-2012"
+    },
+    "journal": {
+        "title": "The Journal",
+        "subtitle": "STORIES & CULTURE",
+        "team": "Team",
+        "careers": "Careers",
+        "guides": "Guides",
+        "read_more": "Read More"
     },
     "footer": {
         "contact": "CONTACT",

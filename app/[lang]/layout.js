@@ -1,5 +1,6 @@
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
+import CartDrawer from '../../components/CartDrawer'
 
 const dictionaries = {
     en: () => import('../../i18n/en.json').then((module) => module.default),
@@ -17,6 +18,7 @@ export default async function LangLayout({ children, params }) {
     return (
         <>
             <Navbar lang={lang} dict={dict} />
+            <CartDrawer lang={lang} />
             <main className="min-h-screen flex flex-col">
                 {children}
             </main>

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { VERIFIED_FACTS } from '../lib/verified-facts'
 
 export default function Footer({ lang = 'en', dict }) {
     const isZh = lang === 'zh'
@@ -26,10 +27,10 @@ export default function Footer({ lang = 'en', dict }) {
                         {t.locations}
                     </h4>
                     <Link href={`/${lang}/locations`} className="block font-mono text-sm mb-2 hover:opacity-60 transition-opacity">
-                        Mount Gravatt East, QLD
+                        Brisbane
                     </Link>
                     <Link href={`/${lang}/locations`} className="block font-mono text-sm hover:opacity-60 transition-opacity">
-                        {isZh ? '台北' : 'Taipei'}, TW
+                        Taipei
                     </Link>
                 </div>
 
@@ -38,22 +39,25 @@ export default function Footer({ lang = 'en', dict }) {
                     <h4 className={`text-[10px] font-sans mb-6 opacity-60 ${isZh ? 'tracking-normal' : 'tracking-[0.3em] uppercase'}`}>
                         {t.social}
                     </h4>
+                    {/* Only show verified Instagram links */}
                     <a
-                        href="https://www.instagram.com/wecut.tw"
+                        href="https://www.instagram.com/wecut.tw/?hl=en"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block font-mono text-sm mb-2 hover:opacity-60 transition-opacity"
                     >
                         Instagram (TW)
                     </a>
-                    <a
-                        href="https://www.instagram.com/wecut_express"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="block font-mono text-sm hover:opacity-60 transition-opacity"
-                    >
-                        Instagram (AU)
-                    </a>
+                    {VERIFIED_FACTS.social.instagram_au && (
+                        <a
+                            href={VERIFIED_FACTS.social.instagram_au}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="block font-mono text-sm hover:opacity-60 transition-opacity"
+                        >
+                            Instagram (AU)
+                        </a>
+                    )}
                 </div>
 
                 {/* NEWSLETTER */}
@@ -79,8 +83,12 @@ export default function Footer({ lang = 'en', dict }) {
                 <div className="max-w-6xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between items-center text-[10px] font-mono text-gray-500">
                     <p>© 2024 WECUT GLOBAL.</p>
                     <div className="flex space-x-6 mt-4 md:mt-0">
-                        <span className="hover:text-paper cursor-pointer transition-colors">{t.terms}</span>
-                        <span className="hover:text-paper cursor-pointer transition-colors">{t.privacy}</span>
+                        <Link href={`/${lang}/legal/terms`} className="hover:text-paper cursor-pointer transition-colors">
+                            {t.terms}
+                        </Link>
+                        <Link href={`/${lang}/legal/privacy`} className="hover:text-paper cursor-pointer transition-colors">
+                            {t.privacy}
+                        </Link>
                     </div>
                 </div>
             </div>

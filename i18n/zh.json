@@ -3,6 +3,7 @@
         "shop": "選購",
         "locations": "門市",
         "about": "關於",
+        "journal": "刊物",
         "search": "搜尋",
         "cart": "購物車"
     },
@@ -35,6 +36,14 @@
     "about": {
         "title": "藍圖",
         "subtitle": "文件編號 AB-2012"
+    },
+    "journal": {
+        "title": "刊物",
+        "subtitle": "故事與文化",
+        "team": "團隊",
+        "careers": "徵才",
+        "guides": "指南",
+        "read_more": "閱讀更多"
     },
     "footer": {
         "contact": "聯絡",

@@ -85,8 +85,8 @@ export default async function Home({ params }) {
                     {/* Product 1 */}
                     <div className="p-12 md:p-16 flex flex-col items-center text-center group cursor-pointer hover:bg-white transition-colors min-h-[380px] justify-center border border-line rounded-none">
                         <div className="w-28 h-36 md:w-32 md:h-40 mb-8 rounded-none overflow-hidden bg-[#E8E6E0]">
-                             <img 
-                                src="/wecut_product.png" 
+                            <img
+                                src="/images/products/shampoo_01.png"
                                 alt="Product"
                                 className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                             />
@@ -103,8 +103,8 @@ export default async function Home({ params }) {
                     {/* Product 2 */}
                     <div className="p-12 md:p-16 flex flex-col items-center text-center group cursor-pointer hover:bg-white transition-colors min-h-[380px] justify-center border border-line rounded-none">
                         <div className="w-28 h-36 md:w-32 md:h-40 mb-8 rounded-none overflow-hidden bg-[#E8E6E0]">
-                             <img 
-                                src="/wecut_product.png" 
+                            <img
+                                src="/images/products/conditioner_01.png"
                                 alt="Product"
                                 className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                             />
@@ -121,8 +121,8 @@ export default async function Home({ params }) {
                     {/* Product 3 */}
                     <div className="p-12 md:p-16 flex flex-col items-center text-center group cursor-pointer hover:bg-white transition-colors min-h-[380px] justify-center border border-line rounded-none">
                         <div className="w-28 h-36 md:w-32 md:h-40 mb-8 rounded-none overflow-hidden bg-[#E8E6E0]">
-                             <img 
-                                src="/wecut_product.png" 
+                            <img
+                                src="/images/products/texture_paste_01.png"
                                 alt="Product"
                                 className="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700"
                             />
@@ -148,6 +148,27 @@ export default async function Home({ params }) {
                             {dict.shop.view_all}
                         </Link>
                     </div>
+                </div>
+            </section>
+
+            {/* JOURNAL TEASER */}
+            <section className="py-32 px-8 border-t border-line bg-paper text-center">
+                <div className="max-w-3xl mx-auto flex flex-col items-center">
+                    <p className={`text-[10px] font-mono text-gray-400 mb-6 ${isZh ? 'tracking-normal' : 'tracking-[0.2em] uppercase'}`}>
+                        {dict.journal?.subtitle || 'STORIES & CULTURE'}
+                    </p>
+                    <h2 className={`text-4xl md:text-6xl font-serif italic mb-10 ${isZh ? 'font-light' : 'font-normal'}`}>
+                        {dict.journal?.title || 'The Journal'}
+                    </h2>
+                    <p className={`text-sm text-gray-600 mb-12 max-w-lg leading-relaxed ${isZh ? 'font-light' : 'font-normal'}`}>
+                        {isZh ? '探索我們的靈感、技術與人物故事。' : 'Explore our inspirations, techniques, and the stories of our people.'}
+                    </p>
+                    <Link
+                        href={`/${lang}/journal`}
+                        className={`border border-ink/30 px-9 py-3 text-[9px] hover:bg-ink hover:text-paper transition-all duration-500 rounded-none ${isZh ? 'tracking-[0.08em]' : 'tracking-[0.2em] uppercase'}`}
+                    >
+                        {dict.journal?.read_more || 'READ MORE'}
+                    </Link>
                 </div>
             </section>
         </div>

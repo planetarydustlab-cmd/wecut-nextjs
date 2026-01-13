@@ -25,6 +25,8 @@ export function middleware(request) {
     if (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/api') ||
+        pathname.startsWith('/admin') ||
+        pathname.startsWith('/auth') ||
         pathname.includes('.') // files with extensions
     ) {
         return NextResponse.next()

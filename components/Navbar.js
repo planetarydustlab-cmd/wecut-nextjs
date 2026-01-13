@@ -2,11 +2,13 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
+import { useCart } from '../lib/context/CartContext'
 
 export default function Navbar({ lang = 'en', dict }) {
     const [menuOpen, setMenuOpen] = useState(false)
+    const { cartItems, setIsCartOpen } = useCart()
     const isZh = lang === 'zh'
-    const t = dict?.nav || { shop: 'SHOP', locations: 'LOCATIONS', about: 'ABOUT', search: 'SEARCH', cart: 'CART' }
+    const t = dict?.nav || { shop: 'SHOP', locations: 'LOCATIONS', about: 'ABOUT', journal: 'JOURNAL', search: 'SEARCH', cart: 'CART' }
 
     return (
         <>
@@ -29,6 +31,9 @@ export default function Navbar({ lang = 'en', dict }) {
                     <Link href={`/${lang}/about`} className="hover:opacity-60 transition-opacity">
                         {t.about}
                     </Link>
+                    <Link href={`/${lang}/journal`} className="hover:opacity-60 transition-opacity">
+                        {t.journal}
+                    </Link>
                 </div>
 
                 {/* Right: Actions + Language Switcher */}
@@ -41,7 +46,12 @@ export default function Navbar({ lang = 'en', dict }) {
                         {lang === 'en' ? '中文' : 'EN'}
                     </Link>
                     <span className="hidden md:inline cursor-pointer hover:opacity-60 transition-opacity">{t.search}</span>
-                    <span className="cursor-pointer hover:opacity-60 transition-opacity">{t.cart} (0)</span>
+                    <button
+                        onClick={() => setIsCartOpen(true)}
+                        className="cursor-pointer hover:opacity-60 transition-opacity"
+                    >
+                        {t.cart} ({cartItems.length})
+                    </button>
                     {/* Mobile Menu Button */}
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
@@ -92,6 +102,13 @@ export default function Navbar({ lang = 'en', dict }) {
                             className="text-2xl font-serif italic hover:opacity-60 transition-opacity"
                         >
                             {isZh ? '關於' : 'About'}
+                        </Link>
+                        <Link
+                            href={`/${lang}/journal`}
+                            onClick={() => setMenuOpen(false)}
+                            className="text-2xl font-serif italic hover:opacity-60 transition-opacity"
+                        >
+                            {isZh ? '刊物' : 'Journal'}
                         </Link>
                     </div>
                 </div>

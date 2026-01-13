@@ -149,7 +149,7 @@ export default async function About({ params }) {
                         </p>
                     </div>
                     <div className="p-8 md:p-12 text-center">
-                        <p className="text-4xl md:text-5xl font-mono font-light">8</p>
+                        <p className="text-4xl md:text-5xl font-mono font-light">6</p>
                         <p className={`text-[10px] font-sans text-gray-500 mt-2 ${isZh ? 'tracking-normal' : 'uppercase tracking-[0.2em]'}`}>
                             {isZh ? '配方' : 'Formulations'}
                         </p>
