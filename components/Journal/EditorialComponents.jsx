@@ -33,3 +33,27 @@ export function PullQuote({ children }) {
         </blockquote>
     )
 }
+// Map Figure (Image + Caption)
+// Map Figure (Image + Caption)
+export function MapFigure({ url, caption }) {
+    return (
+        <figure className="my-24 w-full block clear-both relative">
+            <div className="w-full border border-line p-1 bg-white">
+                <div className="w-full relative overflow-hidden bg-concrete">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                        src={url}
+                        alt={caption || 'Map'}
+                        className="w-full h-auto block"
+                    />
+                </div>
+            </div>
+            {caption && (
+                <figcaption className="mt-4 flex items-center justify-center gap-2 text-[10px] font-mono uppercase tracking-widest text-gray-500">
+                    <span className="inline-block w-4 h-px bg-gray-400"></span>
+                    POINT: {caption}
+                </figcaption>
+            )}
+        </figure>
+    )
+}

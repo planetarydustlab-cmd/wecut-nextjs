@@ -17,7 +17,6 @@
 /* --- Paragraphs --- */
 .journal-prose p {
     margin-bottom: 2em;
-    font-family: 'Times New Roman', Times, serif;
 }
 
 /* Safe Drop Cap: Only apply to the first paragraph that is NOT inside a blockquote/div */
@@ -33,7 +32,6 @@
 
 /* --- Headings --- */
 .journal-prose h2 {
-    font-family: 'Courier New', Courier, monospace;
     font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.2em;
@@ -47,7 +45,6 @@
 }
 
 .journal-prose h3 {
-    font-family: 'Times New Roman', Times, serif;
     font-style: italic;
     font-size: 1.5rem;
     margin-top: 2em;

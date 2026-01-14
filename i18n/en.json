@@ -53,5 +53,12 @@
         "join": "JOIN",
         "terms": "TERMS",
         "privacy": "PRIVACY"
+    },
+    "journal_footer": {
+        "next_story": "NEXT ENTRY",
+        "prev_story": "PREVIOUS ENTRY",
+        "share": "SHARE",
+        "copy_link": "COPY LINK",
+        "link_copied": "LINK COPIED"
     }
 }

@@ -38,57 +38,78 @@ export default async function Article({ params, searchParams }) {
     }
 
     // 2. Fetch Helper Data (Nav & Related)
+    const titleField = isZh ? 'title_zh' : 'title_en'
+
     // Prev: created_at BEFORE current
-    const { data: prevPost } = await supabase
+    let prevQuery = supabase
         .from('posts')
-        .select('title_en, slug')
+        .select(`title_en, title_zh, slug`)
         .lt('created_at', post.created_at)
         .eq('published', true)
         .order('created_at', { ascending: false })
         .limit(1)
-        .single()
+
+    if (isZh) prevQuery = prevQuery.not('title_zh', 'is', null)
+    else prevQuery = prevQuery.not('title_en', 'is', null)
+
+    const { data: prevPost } = await prevQuery.single()
 
     // Next: created_at AFTER current
-    const { data: nextPost } = await supabase
+    let nextQuery = supabase
         .from('posts')
-        .select('title_en, slug')
+        .select(`title_en, title_zh, slug`)
         .gt('created_at', post.created_at)
         .eq('published', true)
         .order('created_at', { ascending: true })
         .limit(1)
-        .single()
+
+    if (isZh) nextQuery = nextQuery.not('title_zh', 'is', null)
+    else nextQuery = nextQuery.not('title_en', 'is', null)
+
+    const { data: nextPost } = await nextQuery.single()
 
     // Related: Matching tags or latest (excluding current)
     let relatedPosts = []
     if (post.tags && post.tags.length > 0) {
-        // Tag overlap (postgres array overlap operator &&)
-        const { data } = await supabase
+        let relatedQuery = supabase
             .from('posts')
-            .select('id, title_en, slug, image_url, created_at')
+            .select('id, title_en, title_zh, slug, image_url, created_at, category')
             .overlaps('tags', post.tags)
             .neq('id', post.id)
             .eq('published', true)
             .limit(4)
+
+        if (isZh) relatedQuery = relatedQuery.not('title_zh', 'is', null)
+        else relatedQuery = relatedQuery.not('title_en', 'is', null)
+
+        const { data } = await relatedQuery
         relatedPosts = data || []
     }
 
     // Fallback if not enough related: Fetch latest
     if (relatedPosts.length < 2) {
-        const { data: latest } = await supabase
+        let latestQuery = supabase
             .from('posts')
-            .select('id, title_en, slug, image_url, created_at')
+            .select('id, title_en, title_zh, slug, image_url, created_at, category')
             .neq('id', post.id)
             .eq('published', true)
             .order('created_at', { ascending: false })
             .limit(4)
 
+        if (isZh) latestQuery = latestQuery.not('title_zh', 'is', null)
+        else latestQuery = latestQuery.not('title_en', 'is', null)
+
+        const { data: latest } = await latestQuery
+
         // Merge and dedupe
         const existingIds = new Set(relatedPosts.map(p => p.id))
-        latest.forEach(p => {
-            if (!existingIds.has(p.id)) {
-                relatedPosts.push(p)
-            }
-        })
+        if (latest) {
+            latest.forEach(p => {
+                if (!existingIds.has(p.id)) {
+                    relatedPosts.push(p)
+                }
+            })
+        }
         relatedPosts = relatedPosts.slice(0, 4)
     }
 
@@ -100,9 +121,8 @@ export default async function Article({ params, searchParams }) {
     const formatDate = (dateString) => {
         if (!dateString) return ''
         const date = new Date(dateString)
-        const month = date.toLocaleString(isZh ? 'zh-TW' : 'en-US', { month: 'short' }).toUpperCase()
-        const year = date.getFullYear()
-        return `${month} ${year}`
+        // Monospace technical format
+        return date.toISOString().split('T')[0]
     }
 
     // Default reading time if not set
@@ -131,19 +151,16 @@ export default async function Article({ params, searchParams }) {
                     </div>
 
                     {/* Title */}
-                    <h1 className={`text-4xl md:text-5xl font-serif italic mb-8 leading-tight ${isZh ? 'font-light' : 'font-normal'}`}>
+                    <h1 className={`text-4xl md:text-5xl font-sans font-bold mb-8 leading-tight text-ink ${isZh ? 'tracking-normal' : 'tracking-tight'}`}>
                         {title}
                     </h1>
                 </JournalLayout>
 
-                {/* Hero Image - Keep it slightly wider? Or strictly 720? 
-                    User requested "Base: centered column, max-width 720–760px". 
-                    Usually images allow break-out. Let's keep image 100% of container (720px) for now per strict rule.
-                */}
+                {/* Hero Image */}
                 {post.image_url && (
                     <JournalLayout className="mb-12">
-                        <div className="aspect-video bg-[#E8E6E0] w-full overflow-hidden">
-                            <img src={post.image_url} alt={title} className="object-cover w-full h-full" />
+                        <div className="w-full relative overflow-hidden bg-[#E8E6E0]">
+                            <img src={post.image_url} alt={title} className="w-full h-auto block" />
                         </div>
                     </JournalLayout>
                 )}
@@ -161,8 +178,8 @@ export default async function Article({ params, searchParams }) {
                     />
                 </JournalLayout>
 
-                {/* Related Posts (Full Width Background but Centered Content) */}
-                <RelatedPosts posts={relatedPosts} currentSlug={slug} />
+                {/* Related Posts (Redesigned) */}
+                <RelatedPosts posts={relatedPosts} currentSlug={slug} lang={lang} />
             </div>
         </div>
     )

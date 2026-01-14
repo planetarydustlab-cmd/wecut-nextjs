@@ -12,8 +12,11 @@
 
     body {
         font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
-        background-color: var(--color-paper);
+        background-color: #FFFFFF !important;
         color: var(--color-ink);
+        background-image: none !important;
+        /* Force remove any gradients */
+        background-attachment: initial !important;
     }
 
     h1,

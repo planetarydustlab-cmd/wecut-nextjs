@@ -12,7 +12,7 @@ export default function Navbar({ lang = 'en', dict }) {
 
     return (
         <>
-            <nav className="sticky top-0 z-50 bg-paper border-b border-line px-6 py-4 flex justify-between items-center bg-opacity-98 backdrop-blur-sm">
+            <nav className="sticky top-0 z-50 bg-white border-b border-line px-6 py-4 flex justify-between items-center">
                 {/* Left: Logo */}
                 <div className="flex-1">
                     <Link href={`/${lang}`} className="text-xl font-serif font-bold tracking-tighter hover:opacity-70 transition-opacity">

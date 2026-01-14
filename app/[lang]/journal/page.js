@@ -20,124 +20,146 @@ export default async function Journal({ params }) {
     const cookieStore = cookies()
     const supabase = createClient(cookieStore)
 
-    // Fetch published posts
-    // Note: We're not fetching author info yet as it requires public profile access policy
-    const { data: posts } = await supabase
+    // Fetch published posts with strict locale filtering
+    let query = supabase
         .from('posts')
-        .select('id, title_en, title_zh, slug, content_en, content_zh, image_url, created_at, published')
+        .select('id, title_en, title_zh, slug, content_en, content_zh, image_url, created_at, published, category, reading_time, tags')
         .eq('published', true)
         .order('created_at', { ascending: false })
 
-    // Determine Featured (Newest) & Recents
-    const featuredPost = posts && posts.length > 0 ? posts[0] : null
-    const recentPosts = posts && posts.length > 1 ? posts.slice(1) : []
+    // STRICT LOCALE FILTERING
+    if (isZh) {
+        query = query.not('title_zh', 'is', null)
+    } else {
+        query = query.not('title_en', 'is', null)
+    }
+
+    const { data: posts } = await query
 
     // Helper functions
     const formatDate = (dateString) => {
         if (!dateString) return ''
+        // Return strict ISO-like format: 2026-01-14
         const date = new Date(dateString)
-        const month = date.toLocaleString(isZh ? 'zh-TW' : 'en-US', { month: 'short' }).toUpperCase()
-        const year = date.getFullYear()
-        return `${month} ${year}`
+        return date.toISOString().split('T')[0]
     }
 
     const getTitle = (post) => (isZh && post.title_zh ? post.title_zh : post.title_en)
 
     const getExcerpt = (post) => {
-        // Strip HTML/Markdown if necessary, but assuming plain text/simple HTML for now. 
-        // A robust solution would strip tags. For now, simple slice.
         const content = isZh && post.content_zh ? post.content_zh : post.content_en
         if (!content) return ''
-        // Simple tag stripping regex
-        const plainText = content.replace(/<[^>]+>/g, '')
+        // Strip Markdown and Editorial Tokens (TL;DR:, NOTE:, QUOTE:)
+        let plainText = content
+            .replace(/^TL;DR:.*$/gm, '') // Remove TL;DR lines
+            .replace(/^NOTE:.*$/gm, '') // Remove NOTE lines
+            .replace(/^QUOTE:.*$/gm, '') // Remove QUOTE lines
+            .replace(/[#*>\-_`\[\]()]/g, '') // Remove Markdown syntax
+            .replace(/\n\s*\n/g, ' ') // Collapse newlines
+            .trim()
+
         return plainText.slice(0, 150) + (plainText.length > 150 ? '...' : '')
+    }
+
+    const formatSerial = (index) => {
+        // Newest post = Highest Number (e.g. Total 3 posts: Index 0 => #3, Index 1 => #2...)
+        const serial = posts.length - index
+        return `NO. ${serial.toString().padStart(3, '0')}`
     }
 
     return (
         <div className="bg-paper min-h-screen">
-            {/* HEADER */}
-            <section className="pt-24 pb-16 px-6 border-b border-line">
-                <div className="max-w-6xl mx-auto">
-                    <p className={`text-[10px] font-mono text-gray-500 mb-4 ${isZh ? 'tracking-normal' : 'tracking-[0.4em] uppercase'}`}>
-                        {dict.journal.subtitle}
+            {/* ARCHIVE HEADER */}
+            {/* Restored Clean White Header implicitly via bg-paper */}
+            <section className="pt-32 pb-16 px-6 border-b border-line">
+                <div className="max-w-[720px] mx-auto text-center">
+                    <p className="text-xs font-mono text-gray-500 mb-4 tracking-widest uppercase">
+                        {dict.journal.subtitle || 'WECUT RESEARCH ARCHIVE'}
                     </p>
-                    <h1 className={`text-5xl md:text-7xl font-serif italic mb-8 ${isZh ? 'font-light' : 'font-normal'}`}>
-                        {dict.journal.title}
+                    <h1 className={`text-4xl md:text-5xl font-sans font-bold tracking-tight mb-8 text-ink leading-none ${isZh ? 'font-light' : ''}`}>
+                        {dict.journal.title || 'Journal'}
                     </h1>
-
-                    {/* SUB-NAV */}
-                    <div className={`flex space-x-8 text-xs font-sans ${isZh ? 'tracking-normal' : 'tracking-widest uppercase'}`}>
-                        <Link href={`/${lang}/journal/careers`} className="hover:opacity-60 transition-opacity border-b border-transparent hover:border-ink pb-1">
-                            {dict.journal.careers}
-                        </Link>
-                    </div>
                 </div>
             </section>
 
-            {/* FEATURED ARTICLE */}
-            {featuredPost ? (
-                <section className="max-w-6xl mx-auto px-6 py-16 border-b border-line">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-                        <div className="aspect-[4/3] bg-[#E8E6E0] w-full relative overflow-hidden group">
-                            {featuredPost.image_url && (
-                                <Link href={`/${lang}/journal/${featuredPost.slug}`}>
-                                    <img
-                                        src={featuredPost.image_url}
-                                        alt={getTitle(featuredPost)}
-                                        className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-                                    />
-                                </Link>
-                            )}
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-mono text-gray-400 mb-4">LATEST / {formatDate(featuredPost.created_at)}</p>
-                            <h2 className={`text-3xl md:text-4xl font-serif italic mb-6 leading-tight ${isZh ? 'font-light' : 'font-normal'}`}>
-                                <Link href={`/${lang}/journal/${featuredPost.slug}`} className="hover:opacity-70 transition-opacity">
-                                    {getTitle(featuredPost)}
-                                </Link>
-                            </h2>
-                            <p className={`text-sm text-gray-600 mb-8 leading-relaxed max-w-md ${isZh ? 'font-light' : 'font-normal'}`}>
-                                {getExcerpt(featuredPost)}
-                            </p>
-                            <Link href={`/${lang}/journal/${featuredPost.slug}`} className={`text-[10px] underline underline-offset-4 hover:opacity-60 transition-opacity ${isZh ? 'tracking-normal' : 'tracking-[0.2em] uppercase'}`}>
-                                {dict.journal.read_more}
-                            </Link>
-                        </div>
-                    </div>
-                </section>
-            ) : (
-                <section className="max-w-6xl mx-auto px-6 py-32 text-center text-gray-400 font-mono text-sm">
-                    NO STORIES PUBLISHED YET
-                </section>
-            )}
+            {/* ARCHIVE LIST (SPLIT ROW) */}
+            <section className="max-w-[1024px] mx-auto px-6 pb-32">
+                {posts && posts.length > 0 ? (
+                    <div className="flex flex-col">
+                        {posts.map((post, index) => (
+                            <article key={post.id} className="group border-b border-line py-12 md:py-16">
+                                <Link href={`/${lang}/journal/${post.slug}`} className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
 
-            {/* RECENT ARTICLES GRID */}
-            {recentPosts.length > 0 && (
-                <section className="max-w-6xl mx-auto px-6 py-16">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-16">
-                        {recentPosts.map((post) => (
-                            <Link href={`/${lang}/journal/${post.slug}`} key={post.id} className="group cursor-pointer block">
-                                <div className="aspect-[3/4] bg-[#E8E6E0] mb-6 transition-opacity hover:opacity-90 overflow-hidden relative">
-                                    {post.image_url && (
-                                        <img
-                                            src={post.image_url}
-                                            className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-                                            alt={getTitle(post)}
-                                        />
-                                    )}
-                                </div>
-                                <p className="text-[10px] font-mono text-gray-400 mb-2">STORIES / {formatDate(post.created_at)}</p>
-                                <h3 className={`text-xl font-serif italic mb-3 leading-snug ${isZh ? 'font-light' : 'font-normal'}`}>
-                                    {getTitle(post)}
-                                </h3>
-                                <div className={`text-[10px] hover:opacity-60 transition-opacity ${isZh ? 'tracking-normal' : 'tracking-[0.2em] uppercase'}`}>
-                                    {dict.journal.read_more}
-                                </div>
-                            </Link>
+                                    {/* LEFT: IMAGE (4:3) */}
+                                    <div className="md:col-span-5 order-2 md:order-1">
+                                        {post.image_url ? (
+                                            <div className="w-full relative overflow-hidden bg-concrete">
+                                                <img
+                                                    src={post.image_url}
+                                                    alt={getTitle(post)}
+                                                    className="w-full h-auto block grayscale group-hover:grayscale-0 transition-all duration-700"
+                                                />
+                                            </div>
+                                        ) : (
+                                            <div className="aspect-[4/3] bg-concrete w-full relative overflow-hidden">
+                                                <div className="w-full h-full flex items-center justify-center bg-[#E5E5E5] text-gray-400 font-mono text-xs tracking-widest">
+                                                    // NO_IMAGE_DATA //
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* RIGHT: CONTENT */}
+                                    <div className="md:col-span-7 order-1 md:order-2 flex flex-col h-full justify-between">
+                                        <div>
+                                            {/* SERIAL & META */}
+                                            <div className="flex justify-between items-baseline border-b border-line/50 pb-4 mb-6">
+                                                <span className="font-mono text-xs text-gray-400">{formatSerial(index)}</span>
+                                                <span className="font-mono text-xs text-gray-400 uppercase">
+                                                    LAB NOTES / {formatDate(post.created_at)}
+                                                </span>
+                                            </div>
+
+                                            {/* TITLE */}
+                                            <h2 className={`text-2xl md:text-3xl font-sans font-bold leading-tight mb-4 group-hover:opacity-70 transition-opacity text-ink ${isZh ? 'tracking-normal' : 'tracking-tight'}`}>
+                                                {getTitle(post)}
+                                            </h2>
+
+                                            {/* CATEGORY & TAGS */}
+                                            <div className="flex flex-wrap gap-2 mb-6">
+                                                <span className="text-[10px] font-mono uppercase bg-concrete px-2 py-1 text-ink/70">
+                                                    {post.category || 'UNCATEGORIZED'}
+                                                </span>
+                                                {post.tags && post.tags.map(tag => (
+                                                    <span key={tag} className="text-[10px] font-mono uppercase border border-line px-2 py-1 text-gray-500">
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+
+                                            {/* EXCERPT */}
+                                            <p className={`text-sm text-gray-600 leading-relaxed font-serif line-clamp-2 max-w-md ${isZh ? 'font-light' : 'font-normal'}`}>
+                                                {getExcerpt(post)}
+                                            </p>
+                                        </div>
+
+                                        {/* ACTION */}
+                                        <div className="mt-8 md:mt-12 text-right">
+                                            <span className="font-mono text-[10px] uppercase tracking-widest hover:bg-ink hover:text-paper px-3 py-2 transition-colors inline-block border border-transparent hover:border-black">
+                                                [ READ_ENTRY ]
+                                            </span>
+                                        </div>
+                                    </div>
+                                </Link>
+                            </article>
                         ))}
                     </div>
-                </section>
-            )}
+                ) : (
+                    <div className="py-32 text-center text-gray-400 font-mono text-sm border-b border-line">
+                        // ARCHIVE EMPTY //
+                    </div>
+                )}
+            </section>
         </div>
     )
 }

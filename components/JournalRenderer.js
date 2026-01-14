@@ -4,7 +4,7 @@ import React, { useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { parseEditorialContent } from '../lib/editorialParser'
-import { TldrBox, NoteAside, PullQuote } from './Journal/EditorialComponents'
+import { TldrBox, NoteAside, PullQuote, MapFigure } from './Journal/EditorialComponents'
 
 export default function JournalRenderer({ content, slug }) {
     // 1. Parse content into blocks
@@ -56,6 +56,11 @@ export default function JournalRenderer({ content, slug }) {
                                     <NoteAside>{block.content}</NoteAside>
                                 </div>
                             </div>
+                        )
+
+                    case 'map':
+                        return (
+                            <MapFigure key={key} url={block.url} caption={block.caption} />
                         )
 
                     case 'markdown':

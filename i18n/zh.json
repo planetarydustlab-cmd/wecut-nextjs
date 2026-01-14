@@ -53,5 +53,12 @@
         "join": "訂閱",
         "terms": "條款",
         "privacy": "隱私"
+    },
+    "journal_footer": {
+        "next_story": "下一篇",
+        "prev_story": "上一篇",
+        "share": "分享",
+        "copy_link": "複製連結",
+        "link_copied": "連結已複製"
     }
 }
