@@ -1,5 +1,6 @@
 import { Inter, Bodoni_Moda, JetBrains_Mono, Noto_Serif_TC, Noto_Sans_TC } from 'next/font/google'
 import '../styles/globals.css'
+import '../styles/journal-prose.css'
 import { CartProvider } from '../lib/context/CartContext'
 import { GoogleAnalytics } from '@next/third-parties/google'
 

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import JournalRenderer from '@/components/JournalRenderer'
 import { createClient } from '../../../../lib/supabase/server'
 import { cookies } from 'next/headers'
 import { notFound } from 'next/navigation'
@@ -61,9 +62,7 @@ export default async function Article({ params }) {
                     </div>
                 )}
 
-                <div className="prose prose-sm md:prose-lg font-serif mx-auto text-gray-700 leading-relaxed whitespace-pre-wrap">
-                    {content}
-                </div>
+                <JournalRenderer content={content} slug={slug} />
             </section>
         </div>
     )
