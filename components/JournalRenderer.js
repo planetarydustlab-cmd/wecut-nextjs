@@ -50,7 +50,6 @@ export default function JournalRenderer({ content, slug }) {
         // Let's try to standardize tokens into HTML comment-like structures or standard markdown.
 
         // Support "TL;DR:" at start
-        // Support "TL;DR:" at start
         if (processed.startsWith('TL;DR:')) {
             processed = processed.replace(/^TL;DR:\s*(.*?)(\n|$)/, '<div class="editorial-tldr"><strong>TL;DR</strong>$1</div>\n')
         }
@@ -68,28 +67,25 @@ export default function JournalRenderer({ content, slug }) {
         return processed
     }, [content])
 
-
-}, [content])
-
-return (
-    <div className={`journal-prose journal-variant-${variant}`}>
-        {/* Using standard ReactMarkdown. */}
-        <ReactMarkdown
-            remarkPlugins={[remarkGfm]}
-            components={{
-                // Custom Pull Quote renderer
-                blockquote: ({ node, children }) => {
-                    return (
-                        <blockquote>
-                            {children}
-                            <footer>— WECUT Journal</footer>
-                        </blockquote>
-                    )
-                }
-            }}
-        >
-            {processedContent}
-        </ReactMarkdown>
-    </div>
-)
+    return (
+        <div className={`journal-prose journal-variant-${variant}`}>
+            {/* Using standard ReactMarkdown. */}
+            <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                    // Custom Pull Quote renderer
+                    blockquote: ({ node, children }) => {
+                        return (
+                            <blockquote>
+                                {children}
+                                <footer>— WECUT Journal</footer>
+                            </blockquote>
+                        )
+                    }
+                }}
+            >
+                {processedContent}
+            </ReactMarkdown>
+        </div>
+    )
 }
