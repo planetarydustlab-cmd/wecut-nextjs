@@ -10,9 +10,10 @@ import remarkGfm from 'remark-gfm'
 // For now, I will assume it's imported globally or I will add it to the component text if using CSS modules.
 // But to match the plan, let's stick to the class name .journal-prose being available.
 
-export default function JournalRenderer({ content, slug }) {
+export default function JournalRenderer({ content, slug, forcedVariant }) {
     // 1. Deterministic Variant Selection
     const variant = useMemo(() => {
+        if (forcedVariant) return forcedVariant // QA Override
         if (!slug) return 'standard'
 
         // Simple hash function
@@ -41,44 +42,55 @@ export default function JournalRenderer({ content, slug }) {
     // Let's stick to the User's "Editorial Tokens" request for now (support > NOTE:, etc).
     // And use the `variant` to wrap the whole article in a specific class for CSS nuances.
 
-    const processedContent = useMemo(() => {
+    const { processedContent, tldr } = useMemo(() => {
         let processed = content || ''
+        let tldrContent = null
 
-        // Transform "NOTE: text" -> <div class="editorial-note">text</div>
-        // We replace it with a custom markdown syntax or HTML if rehype-raw is not used.
-        // safely, let's use a blockquote-like syntax or just generic replacement?
-        // Let's try to standardize tokens into HTML comment-like structures or standard markdown.
-
-        // Support "TL;DR:" at start
-        if (processed.startsWith('TL;DR:')) {
-            processed = processed.replace(/^TL;DR:\s*(.*?)(\n|$)/, '<div class="editorial-tldr"><strong>TL;DR</strong>$1</div>\n')
+        // 1. Extract TL;DR completely (don't leave it in markdown)
+        const tldrMatch = processed.match(/^TL;DR:\s*(.*?)(\n|$)/)
+        if (tldrMatch) {
+            tldrContent = tldrMatch[1]
+            processed = processed.replace(/^TL;DR:\s*(.*?)(\n|$)/, '') // Remove from body
         }
 
-        // Support "NOTE:" lines -> Sidebar notes
-        // Regex: Start of line, "NOTE:", capture content, end of line.
-        // Replaces with a markdown blockquote styled as a note using a hack or just standard quote if using standard markdown.
-        // We will separate it by lines.
+        // 2. Token Replacement for Markdown Mapping
+        // NOTE: text -> > **NOTE** text
         processed = processed.replace(/^NOTE:\s*(.*)$/gm, '> **NOTE** $1')
 
-        // Support "QUOTE:" lines -> Pull quotes
-        // Replace "QUOTE:" with `> $1`
+        // QUOTE: text -> > text
         processed = processed.replace(/^QUOTE:\s*(.*)$/gm, '> $1')
 
-        return processed
+        return { processedContent: processed, tldr: tldrContent }
     }, [content])
 
     return (
         <div className={`journal-prose journal-variant-${variant}`}>
-            {/* Using standard ReactMarkdown. */}
+            {/* Render TL;DR as a sanitized React component if it exists */}
+            {tldr && (
+                <div className="editorial-tldr">
+                    <strong>TL;DR</strong> {tldr}
+                </div>
+            )}
+
             <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 components={{
-                    // Custom Pull Quote renderer
+                    // Custom Blockquote Renderer to distinguish Notes from Quotes
                     blockquote: ({ node, children }) => {
+                        // Check if the first child is a paragraph containing "**NOTE**"
+                        // This is a bit tricky with React children. 
+                        // Simplified check: CSS targeting or string check?
+                        // safer to assume if the raw text started with NOTE, it's a note.
+                        // But here we only have the AST children.
+
+                        // We will rely on CSS :has or class injection?
+                        // Since we can't easily inspect children deep props here without complexity,
+                        // let's stick to the CSS solution for Variant D (Sidebar) checking for "strong" tag inside blockquote.
+                        // BUT for layout safety, we can wrap standard quotes in <figure>.
+
                         return (
                             <blockquote>
                                 {children}
-                                <footer>— WECUT Journal</footer>
                             </blockquote>
                         )
                     }

@@ -13,7 +13,7 @@ async function getDictionary(locale) {
     return dictionaries[locale]()
 }
 
-export default async function Article({ params }) {
+export default async function Article({ params, searchParams }) {
     const lang = params.lang || 'en'
     const slug = params.slug
     const dict = await getDictionary(lang)
@@ -62,7 +62,7 @@ export default async function Article({ params }) {
                     </div>
                 )}
 
-                <JournalRenderer content={content} slug={slug} />
+                <JournalRenderer content={content} slug={slug} forcedVariant={searchParams?.variant} />
             </section>
         </div>
     )
